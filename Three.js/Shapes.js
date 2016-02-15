@@ -6,6 +6,10 @@ var keyboard = new THREEx.KeyboardState();
 var clock = new THREE.Clock();
 // custom global variables
 var cube;
+var shapes;
+var sphere, tetra, dome, diamond, cone, bagel;
+var parameters;
+var gui;
 
 init();
 animate();
@@ -74,9 +78,9 @@ function init()
 	floor.rotation.x = Math.PI / 2;
 	scene.add(floor);
 	// SKYBOX/FOG
-	var skyBoxGeometry = new THREE.CubeGeometry( 10000, 10000, 10000 );
-	var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x9999ff, side: THREE.BackSide } );
-	var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
+	// var skyBoxGeometry = new THREE.CubeGeometry( 10000, 10000, 10000 );
+	// var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x9999ff, side: THREE.BackSide } );
+	// var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
   // scene.add(skyBox);
 	scene.fog = new THREE.FogExp2( 0x9999ff, 0.00025 );
 
@@ -84,163 +88,136 @@ function init()
 	// CUSTOM //
 	////////////
 
-	// Using wireframe materials to illustrate shape details.
-	var darkMaterial = new THREE.MeshBasicMaterial( { color: 0xffffcc } );
-	var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, transparent: true } );
-	var multiMaterial = [ darkMaterial, wireframeMaterial ];
+	// Using phongMaterial
+	var shapeMaterial = new THREE.MeshPhongMaterial( { color:0xff0000, transparent:true, opacity:1 } );
 
-	// tetrahedron
-	var shape = THREE.SceneUtils.createMultiMaterialObject(
-		new THREE.TetrahedronGeometry( 40, 0 ),
-		multiMaterial );
-	shape.position.set(0, 23, -200); //23 is the height made off of tetrahedron radius calculations
-	scene.add( shape );
+	//tetrahedron
+	var tetraGeometry = new THREE.TetrahedronGeometry( 40, 0);
+	tetra = new THREE.Mesh(tetraGeometry, shapeMaterial);
+	tetra.position.set(0,23,-200); //23 is half height based on tetrahedron geometry
+	scene.add(tetra);
 
-	// dome
-	var shape = THREE.SceneUtils.createMultiMaterialObject(
-		new THREE.SphereGeometry( 40, 32, 16, 0, 2 * Math.PI, 0, Math.PI / 2 ),
-		multiMaterial );
-	// should set material to doubleSided = true so that the
-	//   interior view does not appear transparent.
-	shape.position.set(0, 0, -100); //bottom of object is where it is set so height set to 0
-	scene.add( shape );
+	//dome
+	var domeGeometry = new THREE.SphereGeometry( 40, 32, 16, 0, 2 * Math.PI, 0, Math.PI / 2 )
+	dome = new THREE.Mesh(domeGeometry, shapeMaterial);
+	dome.position.set(0, 0, -100); //bottom of object is where it is set so height set to 0
+	scene.add( dome );
 
-	// torus - diamond
-	var shape = THREE.SceneUtils.createMultiMaterialObject(
-	    // radius of entire torus, diameter of tube (less than total radius),
-		// segments around radius, segments around torus ("sides")
-		new THREE.TorusGeometry( 25, 10, 8, 4 ),
-		multiMaterial );
-	shape.position.set(0, 35, 0); //height is radius of torus plus diameter of tube
-	scene.add( shape );
+	//torus - diamond
+	var diamondGeometry = new THREE.TorusGeometry( 25, 10, 8, 4 );
+	diamond = new THREE.Mesh(diamondGeometry, shapeMaterial);
+	diamond.position.set(0, 35, 0); //height is radius of torus plus diameter of tube
+	scene.add( diamond );
 
-	// cone - truncated
-	var shape = THREE.SceneUtils.createMultiMaterialObject(
-		// radiusAtTop, radiusAtBottom, height, segmentsAroundRadius, segmentsAlongHeight,
-		new THREE.CylinderGeometry( 10, 30, 100, 20, 4 ),
-		multiMaterial );
-	shape.position.set(0, 50, 100); // height is half height of cone
-	scene.add( shape );
+	//var - cone
+	var coneGeometry = new THREE.CylinderGeometry( 10, 30, 100, 20, 4 );
+	cone = new THREE.Mesh(coneGeometry, shapeMaterial);
+	cone.position.set(0, 50, 100); // height is half height of cone
+	scene.add(cone);
 
-	// torus - bagel
-	var shape = THREE.SceneUtils.createMultiMaterialObject(
-	    // radius of entire torus, diameter of tube (less than total radius),
-		// sides per cylinder segment, cylinders around torus ("sides")
-		new THREE.TorusGeometry( 30, 20, 16, 40 ),
-		multiMaterial );
-	shape.position.set(0, 50, 200); //height is radius of torus plus diameter of tube
-	scene.add( shape );
+	//torus - bagel
+	var bagelGeometry = new THREE.TorusGeometry( 30, 20, 16, 40 );
+	bagel = new THREE.Mesh(bagelGeometry, shapeMaterial);
+	bagel.position.set(0, 50, 200); //height is radius of torus plus diameter of tube
+	scene.add( bagel );
 
-	// var axes = new THREE.AxisHelper(10);
-	// scene.add(axes);
-	//
-	//
-	// gui = new dat.GUI();
-	//
-	// parameters =
-	// {
-	// 	x: 0, y: 30, z: 0,
-	// 	color:  "#ff0000", // color (change "#" to "0x")
-	// 	colorA: "#000000", // color (change "#" to "0x")
-	// 	colorE: "#000033", // color (change "#" to "0x")
-	// 	colorS: "#ffff00", // color (change "#" to "0x")
-	// 			shininess: 30,
-	// 	opacity: 1,
-	// 	visible: true,
-	// 	material: "Phong",
-	// 	reset: function() { resetSphere() }
-	// };
-	//
-	//
-	// var folder1 = gui.addFolder('Position');
-	// var sphereX = folder1.add( parameters, 'x' ).min(-200).max(200).step(1).listen();
-	// var sphereY = folder1.add( parameters, 'y' ).min(0).max(100).step(1).listen();
-	// var sphereZ = folder1.add( parameters, 'z' ).min(-200).max(200).step(1).listen();
-	// folder1.open();
-	//
-	// sphereX.onChange(function(value)
-	// {   sphere.position.x = value;   });
-	// sphereY.onChange(function(value)
-	// {   sphere.position.y = value;   });
-	// sphereZ.onChange(function(value)
-	// {   sphere.position.z = value;   });
-	//
-	// var sphereColor = gui.addColor( parameters, 'color' ).name('Color (Diffuse)').listen();
-	// sphereColor.onChange(function(value) // onFinishChange
-	// {   sphere.material.color.setHex( value.replace("#", "0x") );   });
-	// var sphereColorA = gui.addColor( parameters, 'colorA' ).name('Color (Ambient)').listen();
-	// sphereColorA.onChange(function(value) // onFinishChange
-	// {   sphere.material.ambient.setHex( value.replace("#", "0x") );   });
-	// var sphereColorE = gui.addColor( parameters, 'colorE' ).name('Color (Emissive)').listen();
-	// sphereColorE.onChange(function(value) // onFinishChange
-	// {   sphere.material.emissive.setHex( value.replace("#", "0x") );   });
-	// var sphereColorS = gui.addColor( parameters, 'colorS' ).name('Color (Specular)').listen();
-	// sphereColorS.onChange(function(value) // onFinishChange
-	// {   sphere.material.specular.setHex( value.replace("#", "0x") );   });
-	// var sphereShininess = gui.add( parameters, 'shininess' ).min(0).max(60).step(1).name('Shininess').listen();
-	// sphereShininess.onChange(function(value)
-	// {   sphere.material.shininess = value;   });
-	// var sphereOpacity = gui.add( parameters, 'opacity' ).min(0).max(1).step(0.01).name('Opacity').listen();
-	// sphereOpacity.onChange(function(value)
-	// {   sphere.material.opacity = value;   });
-	//
-	// var sphereMaterial = gui.add( parameters, 'material', [ "Basic", "Lambert", "Phong", "Wireframe" ] ).name('Material Type').listen();
-	// sphereMaterial.onChange(function(value)
-	// {   updateSphere();   });
-	//
-	// gui.add( parameters, 'reset' ).name("Reset Sphere Parameters");
-	//
-	// gui.open();
-	// updateSphere();
+	var sphereGeometry = new THREE.SphereGeometry( 100, 50, 50 );
+	sphere = new THREE.Mesh( sphereGeometry, shapeMaterial );
+	sphere.position.set(0,30,0);
+	scene.add(sphere);
+
+	shapes = [tetra, dome, diamond, cone, bagel];
+
+	gui = new dat.GUI();
+
+	parameters =
+	{
+		color:  "#ff0000", // color (change "#" to "0x")
+		colorA: "#000000", // color (change "#" to "0x")
+		colorE: "#000033", // color (change "#" to "0x")
+		colorS: "#ffff00", // color (change "#" to "0x")
+        shininess: 30,
+		opacity: 1,
+		visible: true,
+		material: "Phong",
+		reset: function() { resetSphere() }
+	};
+
+	var sphereColor = gui.addColor( parameters, 'color' ).name('Color (Diffuse)').listen();
+	sphereColor.onChange(function(value) // onFinishChange
+	{   sphere.material.color.setHex( value.replace("#", "0x") );   });
+	var sphereColorA = gui.addColor( parameters, 'colorA' ).name('Color (Ambient)').listen();
+	sphereColorA.onChange(function(value) // onFinishChange
+	{   sphere.material.ambient.setHex( value.replace("#", "0x") );   });
+	var sphereColorE = gui.addColor( parameters, 'colorE' ).name('Color (Emissive)').listen();
+	sphereColorE.onChange(function(value) // onFinishChange
+	{   sphere.material.emissive.setHex( value.replace("#", "0x") );   });
+	var sphereColorS = gui.addColor( parameters, 'colorS' ).name('Color (Specular)').listen();
+	sphereColorS.onChange(function(value) // onFinishChange
+	{   sphere.material.specular.setHex( value.replace("#", "0x") );   });
+	var sphereShininess = gui.add( parameters, 'shininess' ).min(0).max(60).step(1).name('Shininess').listen();
+	sphereShininess.onChange(function(value)
+	{   sphere.material.shininess = value;   });
+	var sphereOpacity = gui.add( parameters, 'opacity' ).min(0).max(1).step(0.01).name('Opacity').listen();
+	sphereOpacity.onChange(function(value)
+	{   sphere.material.opacity = value;   });
+
+	var sphereMaterial = gui.add( parameters, 'material', [ "Basic", "Lambert", "Phong", "Wireframe" ] ).name('Material Type').listen();
+	sphereMaterial.onChange(function(value)
+	{   updateSphere();   });
+
+	gui.add( parameters, 'reset' ).name("Reset Sphere Parameters");
+
+	gui.open();
+	updateSphere();
+}
+
+function updateSphere()
+{
+	var value = parameters.material;
+	var newMaterial;
+	if (value == "Basic")
+		newMaterial = new THREE.MeshBasicMaterial( { color: 0x000000 } );
+	else if (value == "Lambert")
+		newMaterial = new THREE.MeshLambertMaterial( { color: 0x000000 } );
+	else if (value == "Phong")
+		newMaterial = new THREE.MeshPhongMaterial( { color: 0x000000 } );
+	else // (value == "Wireframe")
+		newMaterial = new THREE.MeshBasicMaterial( { wireframe: true } );
+	sphere.material = newMaterial;
+
+	sphere.position.x = parameters.x;
+	sphere.position.y = parameters.y;
+	sphere.position.z = parameters.z;
+	sphere.material.color.setHex( parameters.color.replace("#", "0x") );
+	if (sphere.material.ambient)
+		sphere.material.ambient.setHex( parameters.colorA.replace("#", "0x") );
+    if (sphere.material.emissive)
+		sphere.material.emissive.setHex( parameters.colorE.replace("#", "0x") );
+	if (sphere.material.specular)
+		sphere.material.specular.setHex( parameters.colorS.replace("#", "0x") );
+    if (sphere.material.shininess)
+		sphere.material.shininess = parameters.shininess;
+	sphere.material.opacity = parameters.opacity;
+	sphere.material.transparent = true;
 
 }
 
-// function updateSphere()
-// {
-// 	var value = parameters.material;
-// 	var newMaterial;
-// 	if (value == "Basic")
-// 		newMaterial = new THREE.MeshBasicMaterial( { color: 0x000000 } );
-// 	else if (value == "Lambert")
-// 		newMaterial = new THREE.MeshLambertMaterial( { color: 0x000000 } );
-// 	else if (value == "Phong")
-// 		newMaterial = new THREE.MeshPhongMaterial( { color: 0x000000 } );
-// 	else // (value == "Wireframe")
-// 		newMaterial = new THREE.MeshBasicMaterial( { wireframe: true } );
-// 	sphere.material = newMaterial;
-//
-// 	sphere.position.x = parameters.x;
-// 	sphere.position.y = parameters.y;
-// 	sphere.position.z = parameters.z;
-// 	sphere.material.color.setHex( parameters.color.replace("#", "0x") );
-// 	if (sphere.material.ambient)
-// 		sphere.material.ambient.setHex( parameters.colorA.replace("#", "0x") );
-//     if (sphere.material.emissive)
-// 		sphere.material.emissive.setHex( parameters.colorE.replace("#", "0x") );
-// 	if (sphere.material.specular)
-// 		sphere.material.specular.setHex( parameters.colorS.replace("#", "0x") );
-//     if (sphere.material.shininess)
-// 		sphere.material.shininess = parameters.shininess;
-// 	sphere.material.opacity = parameters.opacity;
-// 	sphere.material.transparent = true;
-//
-// }
-//
-// function resetSphere()
-// {
-// 	parameters.x = 0;
-// 	parameters.y = 30;
-// 	parameters.z = 0;
-// 	parameters.color = "#ff0000";
-// 	parameters.colorA = "#000000";
-// 	parameters.colorE = "#000033";
-// 	parameters.colorS = "#ffff00";
-//     parameters.shininess = 30;
-// 	parameters.opacity = 1;
-// 	parameters.visible = true;
-// 	parameters.material = "Phong";
-// 	updateSphere();
-// }
+function resetSphere()
+{
+	parameters.x = 0;
+	parameters.y = 30;
+	parameters.z = 0;
+	parameters.color = "#ff0000";
+	parameters.colorA = "#000000";
+	parameters.colorE = "#000033";
+	parameters.colorS = "#ffff00";
+    parameters.shininess = 30;
+	parameters.opacity = 1;
+	parameters.visible = true;
+	parameters.material = "Phong";
+	updateSphere();
+}
 
 function animate()
 {
