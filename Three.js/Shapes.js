@@ -5,10 +5,8 @@ var container, scene, camera, renderer, controls, stats;
 var keyboard = new THREEx.KeyboardState();
 var clock = new THREE.Clock();
 // custom global variables
-var cube;
 var lamp;
 var shapes;
-var tetra, dome, diamond, cone, bagel;
 var parameters;
 var gui;
 
@@ -248,7 +246,6 @@ function updateShapes()
 	shapes.forEach(function (shape) {
 			updateShape(shape, newMaterial);
 		});
-
 }
 
 function updateShape(shape, newMaterial){
