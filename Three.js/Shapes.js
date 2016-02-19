@@ -7,6 +7,7 @@ var clock = new THREE.Clock();
 // custom global variables
 var cube;
 var shapes;
+var lamp;
 var tetra, dome, diamond, cone, bagel;
 var shapeMaterial;
 var parameters;
@@ -59,7 +60,7 @@ function init()
 	var light2 = new THREE.AmbientLight(0x333333);
 	light2.position.set( light.position );
 	scene.add(light2);
-	
+
 	// FLOOR
 	var floorTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' );
 	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
@@ -115,12 +116,12 @@ function init()
 	scene.add( bagel );
 
 	// create a small sphere to show position of light
-	var lightbulb = new THREE.Mesh(
+	lamp = new THREE.Mesh(
 		new THREE.SphereGeometry( 10, 16, 8 ),
 		new THREE.MeshBasicMaterial( { color: 0xffaa00 } )
 	);
-	lightbulb.position = light.position;
-	scene.add( lightbulb );
+	lamp.position = light.position;
+	scene.add( lamp );
 
 	gui = new dat.GUI();
 
@@ -128,6 +129,7 @@ function init()
 
 	parameters =
 	{
+		x: -100, y: 150,z: 100,
 		color:  "#ff0000", // color (change "#" to "0x")
 		colorA: "#000000", // color (change "#" to "0x")
 		colorE: "#000033", // color (change "#" to "0x")
@@ -135,8 +137,24 @@ function init()
         shininess: 30,
 		opacity: 1,
 		visible: true,
-		material: "Phong"
+		material: "Phong",
+		reset: function() { resetLamp() }
 	};
+
+	var folder1 = gui.addFolder('Lamp Position');
+	var lampX = folder1.add( parameters, 'x' ).min(-200).max(200).step(1).listen();
+	var lampY = folder1.add( parameters, 'y' ).min(-200).max(200).step(1).listen();
+	var lampZ = folder1.add( parameters, 'z' ).min(-200).max(200).step(1).listen();
+	folder1.open();
+
+	lampX.onChange(function(value)
+	{   lamp.position.x = value;   });
+	lampY.onChange(function(value)
+	{   lamp.position.y = value;   });
+	lampZ.onChange(function(value)
+	{   lamp.position.z = value;   });
+
+	gui.add( parameters, 'reset' ).name("Reset Lamp Positions");
 
 	var shapeColor = gui.addColor( parameters, 'color' ).name('Color (Diffuse)').listen();
 	shapeColor.onChange(function(value) // onFinishChange
@@ -221,6 +239,13 @@ function updateShape(shape, newMaterial){
 		shape.material.shininess = parameters.shininess;
 	shape.material.opacity = parameters.opacity;
 	shape.material.transparent = true;
+}
+
+function resetLamp()
+{
+	lamp.position.x = parameters.x = -100;
+	lamp.position.y = parameters.y = 150;
+	lamp.position.z = parameters.z = 100;
 }
 
 function animate()
