@@ -50,6 +50,7 @@ function init()
 	// LIGHT
 	var light = new THREE.PointLight(0xffffff);
 	light.position.set(-100,150,100);
+	scene.add(light);
 
 	// need to add an ambient light
 	//  for ambient colors to be visible
@@ -58,16 +59,7 @@ function init()
 	var light2 = new THREE.AmbientLight(0x333333);
 	light2.position.set( light.position );
 	scene.add(light2);
-
-	var lightbulbGeometry = new THREE.SphereGeometry( 10, 16, 8 );
-	var lightbulbMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff, transparent: true,  opacity: 0.8, blending: THREE.AdditiveBlending } );
-	var wireMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true } );
-	var materialArray = [lightbulbMaterial, wireMaterial];
-	var lightbulb = THREE.SceneUtils.createMultiMaterialObject( lightbulbGeometry, materialArray );
-	lightbulb.position = light.position;
-	scene.add(lightbulb);
-	scene.add(light);
-
+	
 	// FLOOR
 	var floorTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' );
 	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
@@ -121,6 +113,14 @@ function init()
 	bagel = new THREE.Mesh(bagelGeometry, shapeMaterial);
 	bagel.position.set(0, 50, 200); //height is radius of torus plus diameter of tube
 	scene.add( bagel );
+
+	// create a small sphere to show position of light
+	var lightbulb = new THREE.Mesh(
+		new THREE.SphereGeometry( 10, 16, 8 ),
+		new THREE.MeshBasicMaterial( { color: 0xffaa00 } )
+	);
+	lightbulb.position = light.position;
+	scene.add( lightbulb );
 
 	gui = new dat.GUI();
 
@@ -191,14 +191,6 @@ function init()
 
 function updateShapes()
 {
-	updateShape(tetra);
-	updateShape(dome);
-	updateShape(diamond);
-	updateShape(cone);
-	updateShape(bagel);
-}
-
-function updateShape(shape){
 	var value = parameters.material;
 	var newMaterial;
 	if (value == "Basic")
@@ -209,6 +201,14 @@ function updateShape(shape){
 		newMaterial = new THREE.MeshPhongMaterial( { color: 0x000000 } );
 	else // (value == "Wireframe")
 		newMaterial = new THREE.MeshBasicMaterial( { wireframe: true } );
+		updateShape(tetra, newMaterial);
+		updateShape(dome, newMaterial);
+		updateShape(diamond, newMaterial);
+		updateShape(cone, newMaterial);
+		updateShape(bagel, newMaterial);
+}
+
+function updateShape(shape, newMaterial){
 	shape.material = newMaterial;
 	shape.material.color.setHex( parameters.color.replace("#", "0x") );
 	if (shape.material.ambient)
