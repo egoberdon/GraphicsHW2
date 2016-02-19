@@ -199,50 +199,48 @@ function init()
 	lampZ.onChange(function(value)
 	{   lamp.position.z = value;   });
 
-	//gui.add( parameters, 'reset' ).name("Reset Lamp Positions");
-
 	var shapeColor = gui.addColor( parameters, 'color' ).name('Color (Diffuse)').listen();
 	shapeColor.onChange(function(value) // onFinishChange
-	{  	tetra.material.color.setHex( value.replace("#", "0x") );
-			dome.material.color.setHex( value.replace("#", "0x") );
-			diamond.material.color.setHex( value.replace("#", "0x") );
-			cone.material.color.setHex( value.replace("#", "0x") );
-			bagel.material.color.setHex( value.replace("#", "0x") ); });
+	{
+			shapes.forEach(function (shape){
+				shape.material.color.setHex( value.replace("#", "0x") );
+			});
+		});
 	var shapeColorA = gui.addColor( parameters, 'colorA' ).name('Color (Ambient)').listen();
 	shapeColorA.onChange(function(value) // onFinishChange
-	{   tetra.material.ambient.setHex( value.replace("#", "0x") );
-			dome.material.ambient.setHex( value.replace("#", "0x") );
-			diamond.material.ambient.setHex( value.replace("#", "0x") );
-			cone.material.ambient.setHex( value.replace("#", "0x") );
-			bagel.material.ambient.setHex( value.replace("#", "0x") ); });
+	{
+			shapes.forEach(function (shape){
+				shape.material.ambient.setHex( value.replace("#", "0x") );
+			});
+		});
 	var shapeColorE = gui.addColor( parameters, 'colorE' ).name('Color (Emissive)').listen();
 	shapeColorE.onChange(function(value) // onFinishChange
-	{   tetra.material.emissive.setHex( value.replace("#", "0x") );
-			dome.material.emissive.setHex( value.replace("#", "0x") );
-			diamond.material.emissive.setHex( value.replace("#", "0x") );
-			cone.material.emissive.setHex( value.replace("#", "0x") );
-			bagel.material.emissive.setHex( value.replace("#", "0x") ); });
+	{
+			shapes.forEach(function (shape){
+				shape.material.emissive.setHex( value.replace("#", "0x") );
+			});
+		});
 	var shapeColorS = gui.addColor( parameters, 'colorS' ).name('Color (Specular)').listen();
 	shapeColorS.onChange(function(value) // onFinishChange
-	{   tetra.material.specular.setHex( value.replace("#", "0x") );
-			dome.material.specular.setHex( value.replace("#", "0x") );
-			diamond.material.specular.setHex( value.replace("#", "0x") );
-			cone.material.specular.setHex( value.replace("#", "0x") );
-			bagel.material.specular.setHex( value.replace("#", "0x") ); });
+	{
+			shapes.forEach(function (shape){
+				shape.material.specular.setHex( value.replace("#", "0x") );
+			});
+		});
 	var shapeShininess = gui.add( parameters, 'shininess' ).min(0).max(60).step(1).name('Shininess').listen();
 	shapeShininess.onChange(function(value)
-	{   tetra.material.shininess = value;
-			dome.material.shininess = value;
-			diamond.material.shininess = value;
-			cone.material.shininess = value;
-			bagel.material.shininess = value; });
+	{
+			shapes.forEach(function (shape){
+				shape.material.shininess = value;
+			});
+		});
 	var shapeOpacity = gui.add( parameters, 'opacity' ).min(0).max(1).step(0.01).name('Opacity').listen();
 	shapeOpacity.onChange(function(value)
-	{   tetra.material.opacity = value;
-			dome.material.opacity = value;
-			diamond.material.opacity = value;
-			cone.material.opacity = value;
-			bagel.material.opacity = value; });
+	{
+			shapes.forEach(function (shape){
+				shape.material.opacity = value;
+			});
+		});
 
 	var shapeMaterial2 = gui.add( parameters, 'material', [ "Basic", "Lambert", "Phong", "Wireframe" ] ).name('Material Type').listen();
 	shapeMaterial2.onChange(function(value)
