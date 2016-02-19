@@ -69,12 +69,6 @@ function init()
 	floor.position.y = -0.5;
 	floor.rotation.x = Math.PI / 2;
 	scene.add(floor);
-	// SKYBOX/FOG
-	// var skyBoxGeometry = new THREE.CubeGeometry( 10000, 10000, 10000 );
-	// var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x9999ff, side: THREE.BackSide } );
-	// var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
-  // scene.add(skyBox);
-	scene.fog = new THREE.FogExp2( 0x9999ff, 0.00025 );
 
 	////////////
 	// CUSTOM //
@@ -121,6 +115,22 @@ function init()
 	lamp.position = light.position;
 	scene.add( lamp );
 
+	//sky
+	var imagePrefix = "images/moondust-";
+	var directions  = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
+	var imageSuffix = ".png";
+	var skyGeometry = new THREE.CubeGeometry( 5000, 5000, 5000 );
+
+	var materialArray = [];
+	for (var i = 0; i < 6; i++)
+		materialArray.push( new THREE.MeshBasicMaterial({
+			map: THREE.ImageUtils.loadTexture( imagePrefix + directions[i] + imageSuffix ),
+			side: THREE.BackSide
+		}));
+	var skyMaterial = new THREE.MeshFaceMaterial( materialArray );
+	var skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
+
+
 	gui = new dat.GUI();
 
 	shapes = [tetra, dome, diamond, cone, bagel];
@@ -136,6 +146,8 @@ function init()
 		opacity: 1,
 		visible: true,
 		material: "Phong",
+		sky: false,
+		hasFloor: true,
 		reset: function() { resetLamp() }
 	};
 
@@ -201,6 +213,20 @@ function init()
 	shapeMaterial2.onChange(function(value)
 	{   updateShapes();   });
 
+	var sky = gui.add( parameters, 'sky' ).name("Sky Box").listen();
+	sky.onChange( function(value) {
+			if (value)
+				scene.add( skyBox );
+			else
+				scene.remove( skyBox );
+			});
+	var hasFloor = gui.add( parameters, 'hasFloor' ).name("Floor").listen();
+	hasFloor.onChange( function(value) {
+				if (value)
+					scene.add( floor );
+				else
+					scene.remove( floor );
+				});
 	gui.open();
 	updateShapes();
 }
