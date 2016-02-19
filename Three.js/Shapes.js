@@ -7,6 +7,7 @@ var clock = new THREE.Clock();
 // custom global variables
 var cube;
 var lamp;
+var shapes;
 var tetra, dome, diamond, cone, bagel;
 var parameters;
 var gui;
@@ -243,11 +244,11 @@ function updateShapes()
 		newMaterial = new THREE.MeshPhongMaterial( { color: 0x000000 } );
 	else // (value == "Wireframe")
 		newMaterial = new THREE.MeshBasicMaterial( { wireframe: true } );
-		updateShape(tetra, newMaterial);
-		updateShape(dome, newMaterial);
-		updateShape(diamond, newMaterial);
-		updateShape(cone, newMaterial);
-		updateShape(bagel, newMaterial);
+
+	shapes.forEach(function (shape) {
+			updateShape(shape, newMaterial);
+		});
+
 }
 
 function updateShape(shape, newMaterial){
