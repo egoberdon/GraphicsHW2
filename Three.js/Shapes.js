@@ -7,7 +7,8 @@ var clock = new THREE.Clock();
 // custom global variables
 var cube;
 var shapes;
-var sphere, tetra, dome, diamond, cone, bagel;
+var tetra, dome, diamond, cone, bagel;
+var shapeMaterial;
 var parameters;
 var gui;
 
@@ -89,7 +90,7 @@ function init()
 	////////////
 
 	// Using phongMaterial
-	var shapeMaterial = new THREE.MeshPhongMaterial( { color:0xff0000, transparent:true, opacity:1 } );
+	shapeMaterial = new THREE.MeshPhongMaterial( { color:0xff0000, transparent:true, opacity:1 } );
 
 	//tetrahedron
 	var tetraGeometry = new THREE.TetrahedronGeometry( 40, 0);
@@ -123,6 +124,8 @@ function init()
 
 	gui = new dat.GUI();
 
+	shapes = [tetra, dome, diamond, cone, bagel];
+
 	parameters =
 	{
 		color:  "#ff0000", // color (change "#" to "0x")
@@ -135,30 +138,52 @@ function init()
 		material: "Phong"
 	};
 
-	var sphereColor = gui.addColor( parameters, 'color' ).name('Color (Diffuse)').listen();
-	sphereColor.onChange(function(value) // onFinishChange
-	{   shapeMaterial.color.setHex( value.replace("#", "0x") );   });
-	var sphereColorA = gui.addColor( parameters, 'colorA' ).name('Color (Ambient)').listen();
-	sphereColorA.onChange(function(value) // onFinishChange
-	{   shapeMaterial.ambient.setHex( value.replace("#", "0x") );   });
-	var sphereColorE = gui.addColor( parameters, 'colorE' ).name('Color (Emissive)').listen();
-	sphereColorE.onChange(function(value) // onFinishChange
-	{   shapeMaterial.emissive.setHex( value.replace("#", "0x") );   });
-	var sphereColorS = gui.addColor( parameters, 'colorS' ).name('Color (Specular)').listen();
-	sphereColorS.onChange(function(value) // onFinishChange
-	{   shapeMaterial.specular.setHex( value.replace("#", "0x") );   });
-	var sphereShininess = gui.add( parameters, 'shininess' ).min(0).max(60).step(1).name('Shininess').listen();
-	sphereShininess.onChange(function(value)
-	{   shapeMaterial.shininess = value;   });
-	var sphereOpacity = gui.add( parameters, 'opacity' ).min(0).max(1).step(0.01).name('Opacity').listen();
-	sphereOpacity.onChange(function(value)
-	{   shapeMaterial.opacity = value;   });
+	var shapeColor = gui.addColor( parameters, 'color' ).name('Color (Diffuse)').listen();
+	shapeColor.onChange(function(value) // onFinishChange
+	{  	tetra.material.color.setHex( value.replace("#", "0x") );
+			dome.material.color.setHex( value.replace("#", "0x") );
+			diamond.material.color.setHex( value.replace("#", "0x") );
+			cone.material.color.setHex( value.replace("#", "0x") );
+			bagel.material.color.setHex( value.replace("#", "0x") ); });
+	var shapeColorA = gui.addColor( parameters, 'colorA' ).name('Color (Ambient)').listen();
+	shapeColorA.onChange(function(value) // onFinishChange
+	{   tetra.material.ambient.setHex( value.replace("#", "0x") );
+			dome.material.ambient.setHex( value.replace("#", "0x") );
+			diamond.material.ambient.setHex( value.replace("#", "0x") );
+			cone.material.ambient.setHex( value.replace("#", "0x") );
+			bagel.material.ambient.setHex( value.replace("#", "0x") ); });
+	var shapeColorE = gui.addColor( parameters, 'colorE' ).name('Color (Emissive)').listen();
+	shapeColorE.onChange(function(value) // onFinishChange
+	{   tetra.material.emissive.setHex( value.replace("#", "0x") );
+			dome.material.emissive.setHex( value.replace("#", "0x") );
+			diamond.material.emissive.setHex( value.replace("#", "0x") );
+			cone.material.emissive.setHex( value.replace("#", "0x") );
+			bagel.material.emissive.setHex( value.replace("#", "0x") ); });
+	var shapeColorS = gui.addColor( parameters, 'colorS' ).name('Color (Specular)').listen();
+	shapeColorS.onChange(function(value) // onFinishChange
+	{   tetra.material.specular.setHex( value.replace("#", "0x") );
+			dome.material.specular.setHex( value.replace("#", "0x") );
+			diamond.material.specular.setHex( value.replace("#", "0x") );
+			cone.material.specular.setHex( value.replace("#", "0x") );
+			bagel.material.specular.setHex( value.replace("#", "0x") ); });
+	var shapeShininess = gui.add( parameters, 'shininess' ).min(0).max(60).step(1).name('Shininess').listen();
+	shapeShininess.onChange(function(value)
+	{   tetra.material.shininess = value;
+			dome.material.shininess = value;
+			diamond.material.shininess = value;
+			cone.material.shininess = value;
+			bagel.material.shininess = value; });
+	var shapeOpacity = gui.add( parameters, 'opacity' ).min(0).max(1).step(0.01).name('Opacity').listen();
+	shapeOpacity.onChange(function(value)
+	{   tetra.material.opacity = value;
+			dome.material.opacity = value;
+			diamond.material.opacity = value;
+			cone.material.opacity = value;
+			bagel.material.opacity = value; });
 
 	var shapeMaterial2 = gui.add( parameters, 'material', [ "Basic", "Lambert", "Phong", "Wireframe" ] ).name('Material Type').listen();
 	shapeMaterial2.onChange(function(value)
 	{   updateShapes();   });
-
-	// gui.add( parameters, 'reset' ).name("Reset Sphere Parameters");
 
 	gui.open();
 	updateShapes();
@@ -166,6 +191,14 @@ function init()
 
 function updateShapes()
 {
+	updateShape(tetra);
+	updateShape(dome);
+	updateShape(diamond);
+	updateShape(cone);
+	updateShape(bagel);
+}
+
+function updateShape(shape){
 	var value = parameters.material;
 	var newMaterial;
 	if (value == "Basic")
@@ -176,34 +209,19 @@ function updateShapes()
 		newMaterial = new THREE.MeshPhongMaterial( { color: 0x000000 } );
 	else // (value == "Wireframe")
 		newMaterial = new THREE.MeshBasicMaterial( { wireframe: true } );
-	shapeMaterial = newMaterial;
-
-	shapeMaterial.color.setHex( parameters.color.replace("#", "0x") );
-	if (shapeMaterial.ambient)
-		shapeMaterial.ambient.setHex( parameters.colorA.replace("#", "0x") );
-    if (shapeMaterial.emissive)
-		shapeMaterial.emissive.setHex( parameters.colorE.replace("#", "0x") );
-	if (shapeMaterial.specular)
-		shapeMaterial.specular.setHex( parameters.colorS.replace("#", "0x") );
-    if (shapeMaterial.shininess)
-		shapeMaterial.shininess = parameters.shininess;
-	shapeMaterial.opacity = parameters.opacity;
-	shapeMaterial.transparent = true;
-
+	shape.material = newMaterial;
+	shape.material.color.setHex( parameters.color.replace("#", "0x") );
+	if (shape.material.ambient)
+		shape.material.ambient.setHex( parameters.colorA.replace("#", "0x") );
+		if (shape.material.emissive)
+		shape.material.emissive.setHex( parameters.colorE.replace("#", "0x") );
+	if (shape.material.specular)
+		shape.material.specular.setHex( parameters.colorS.replace("#", "0x") );
+		if (shape.material.shininess)
+		shape.material.shininess = parameters.shininess;
+	shape.material.opacity = parameters.opacity;
+	shape.material.transparent = true;
 }
-//
-// function resetSphere()
-// {
-// 	parameters.color = "#ff0000";
-// 	parameters.colorA = "#000000";
-// 	parameters.colorE = "#000033";
-// 	parameters.colorS = "#ffff00";
-//     parameters.shininess = 30;
-// 	parameters.opacity = 1;
-// 	parameters.visible = true;
-// 	parameters.material = "Phong";
-// 	updateSphere();
-// }
 
 function animate()
 {
