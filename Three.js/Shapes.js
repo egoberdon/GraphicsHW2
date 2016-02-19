@@ -6,10 +6,8 @@ var keyboard = new THREEx.KeyboardState();
 var clock = new THREE.Clock();
 // custom global variables
 var cube;
-var shapes;
 var lamp;
 var tetra, dome, diamond, cone, bagel;
-var shapeMaterial;
 var parameters;
 var gui;
 
@@ -83,7 +81,7 @@ function init()
 	////////////
 
 	// Using phongMaterial
-	shapeMaterial = new THREE.MeshPhongMaterial( { color:0xff0000, transparent:true, opacity:1 } );
+	var shapeMaterial = new THREE.MeshPhongMaterial( { color:0xff0000, transparent:true, opacity:1 } );
 
 	//tetrahedron
 	var tetraGeometry = new THREE.TetrahedronGeometry( 40, 0);
@@ -142,11 +140,11 @@ function init()
 	};
 
 	var folder1 = gui.addFolder('Lamp Position');
+	folder1.add( parameters, 'reset' ).name("Reset Lamp Positions");
 	var lampX = folder1.add( parameters, 'x' ).min(-200).max(200).step(1).listen();
 	var lampY = folder1.add( parameters, 'y' ).min(-200).max(200).step(1).listen();
 	var lampZ = folder1.add( parameters, 'z' ).min(-200).max(200).step(1).listen();
 	folder1.open();
-
 	lampX.onChange(function(value)
 	{   lamp.position.x = value;   });
 	lampY.onChange(function(value)
@@ -154,7 +152,7 @@ function init()
 	lampZ.onChange(function(value)
 	{   lamp.position.z = value;   });
 
-	gui.add( parameters, 'reset' ).name("Reset Lamp Positions");
+	//gui.add( parameters, 'reset' ).name("Reset Lamp Positions");
 
 	var shapeColor = gui.addColor( parameters, 'color' ).name('Color (Diffuse)').listen();
 	shapeColor.onChange(function(value) // onFinishChange
